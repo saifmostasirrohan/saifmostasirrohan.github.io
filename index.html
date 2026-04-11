@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Saif Mostasir Rohan — AI Researcher</title>
+<style>
+  /* ── CSS VARIABLES — edit these to retheme everything ── */
+  :root {
+    --bg:          #000300;
+    --chrome:      #000900;
+    --card:        #010b01;
+    --line:        #0a2a0a;
+    --accent:      #39FF14;
+    --accent-dim:  #00AA44;
+    --heading:     #CCFFCC;
+    --body:        #7CFC00;
+    --sub:         #2E8B57;
+    --dim:         #145214;
+    --ghost:       #0a3a0a;
+    --tag-bg:      rgba(57,255,20,0.07);
+    --tag-border:  rgba(57,255,20,0.25);
+    --badge:       rgba(57,255,20,0.10);
+    --badge-b:     rgba(57,255,20,0.35);
+    --gold:        #ADFF2F;
+    --red:         #FF3131;
+    --font:        'Courier New', 'Lucida Console', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--body);
+    font-family: var(--font);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── SCANLINES ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      rgba(0,0,0,0.10) 2px, rgba(0,0,0,0.10) 4px
+    );
+    pointer-events: none; z-index: 9999;
+  }
+
+  /* ── MATRIX CANVAS ── */
+  #matrix-canvas {
+    position: fixed; inset: 0;
+    opacity: 0.20; z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ── NAVBAR ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: rgba(0,3,0,0.93);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(10px);
+    display: flex; align-items: center;
+    padding: 0 28px; height: 52px;
+    box-shadow: 0 1px 0 rgba(0,170,68,0.3);
+  }
+
+  .nav-dots { display: flex; gap: 7px; margin-right: 18px; }
+  .dot {
+    width: 11px; height: 11px; border-radius: 50%;
+  }
+  .dot.red   { background:#FF5F57; box-shadow:0 0 5px #FF5F57; }
+  .dot.yellow{ background:#FEBC2E; box-shadow:0 0 5px #FEBC2E; }
+  .dot.green { background:#28C840; box-shadow:0 0 5px #28C840; }
+
+  .nav-host {
+    font-size: 10px; color: var(--dim);
+    letter-spacing: .12em; margin-right: auto;
+  }
+
+  .nav-tabs { display: flex; }
+  .nav-tab {
+    background: none; border: none; border-bottom: 2px solid transparent;
+    font-family: var(--font); font-size: 10px; cursor: pointer;
+    padding: 0 14px; height: 52px; letter-spacing: .08em;
+    color: var(--dim); transition: all .15s;
+  }
+  .nav-tab:hover { color: var(--accent-dim); }
+  .nav-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    text-shadow: 0 0 8px var(--accent);
+  }
+
+  .nav-badge {
+    margin-left: 18px; font-size: 9px;
+    background: var(--badge); color: var(--accent);
+    border: 1px solid var(--badge-b);
+    padding: 2px 10px; letter-spacing: .10em;
+    text-shadow: 0 0 8px var(--accent);
+  }
+
+  /* ── LAYOUT ── */
+  .page { position: relative; z-index: 10; }
+  .section {
+    display: none;
+    max-width: 900px; margin: 0 auto;
+    padding: 80px 28px 80px;
+  }
+  .section.active { display: block; }
+
+  /* ── SECTION HEADER ── */
+  .sec-label {
+    font-size: 10px; color: var(--ghost);
+    letter-spacing: .15em; margin-bottom: 8px;
+  }
+  .sec-title {
+    font-size: 22px; color: var(--heading);
+    margin-bottom: 32px; letter-spacing: .08em;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    border: 1px solid var(--line);
+    background: var(--card);
+    padding: 18px 22px;
+    margin-bottom: 12px;
+    transition: box-shadow .2s, border-color .2s;
+  }
+  .card:hover {
+    box-shadow: 0 0 20px rgba(57,255,20,0.07);
+    border-color: var(--accent-dim);
+  }
+  .card.accent-left { border-left: 3px solid var(--accent); }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-block; font-size: 9px;
+    background: var(--badge); color: var(--accent);
+    border: 1px solid var(--badge-b);
+    padding: 1px 8px; letter-spacing: .10em;
+    text-shadow: 0 0 6px var(--accent);
+    white-space: nowrap;
+  }
+  .badge.gold { color: var(--gold); background: rgba(173,255,47,.10); border-color: rgba(173,255,47,.35); text-shadow: none; }
+  .badge.red  { color: var(--red);  background: rgba(255,49,49,.10);  border-color: rgba(255,49,49,.35);  text-shadow: none; }
+
+  /* ── TAGS ── */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .tag {
+    font-size: 9px; letter-spacing: .06em;
+    border: 1px solid var(--tag-border);
+    color: var(--accent-dim); padding: 2px 8px;
+    background: var(--tag-bg);
+  }
+
+  /* ── PROMPT ── */
+  .prompt {
+    margin-top: 40px; font-size: 11px;
+    display: flex; gap: 6px; align-items: center;
+  }
+  .prompt-user { color: var(--accent); text-shadow: 0 0 8px var(--accent); }
+  .prompt-sym  { color: var(--dim); }
+
+  /* ── CURSOR ── */
+  .cursor {
+    display: inline-block;
+    color: var(--accent);
+    text-shadow: 0 0 8px var(--accent);
+    animation: blink .55s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ── GLITCH ── */
+  .glitch {
+    font-size: 48px; font-weight: 900;
+    letter-spacing: .10em; line-height: 1;
+    color: var(--heading);
+    text-shadow: 0 0 20px rgba(204,255,204,.4), 0 0 40px rgba(57,255,20,.2);
+    display: inline-block;
+  }
+
+  /* ── HOME HERO ── */
+  .hero-bar {
+    border-left: 3px solid var(--accent-dim);
+    padding-left: 28px; margin-bottom: 44px;
+  }
+  .hero-role {
+    font-size: 13px; color: var(--accent);
+    margin: 12px 0 4px; letter-spacing: .18em;
+    text-shadow: 0 0 10px var(--accent);
+  }
+  .hero-loc {
+    font-size: 11px; color: var(--sub);
+    letter-spacing: .08em;
+  }
+
+  /* ── STATUS GRID ── */
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+    gap: 10px; margin-bottom: 44px;
+  }
+  .status-box {
+    border: 1px solid var(--line);
+    background: var(--card); padding: 14px 16px;
+  }
+  .status-key {
+    font-size: 9px; color: var(--dim);
+    letter-spacing: .10em; margin-bottom: 6px;
+  }
+  .status-val { font-size: 12px; color: var(--body); }
+  .status-val.gold { color: var(--gold); }
+  .status-val.accent { color: var(--accent); }
+
+  /* ── ABOUT ── */
+  .about-text {
+    font-size: 13px; color: var(--sub);
+    line-height: 1.9; max-width: 680px;
+  }
+
+  /* ── BOOT LINES ── */
+  .boot { font-size: 11px; margin-bottom: 36px; line-height: 2.2; }
+  .boot-line { opacity: 0; animation: fadein .3s forwards; }
+  .boot-line:nth-child(1) { animation-delay: .2s; }
+  .boot-line:nth-child(2) { animation-delay: .9s; }
+  .boot-line:nth-child(3) { animation-delay: 1.6s; }
+  @keyframes fadein { to { opacity: 1; } }
+  .boot-arrow { color: var(--dim); }
+  .boot-text  { color: var(--sub); }
+  .boot-ok    { color: var(--accent-dim); }
+
+  /* ── RESEARCH ── */
+  .pub-title {
+    font-size: 14px; color: var(--heading);
+    font-weight: 700; letter-spacing: .03em;
+    line-height: 1.5; margin-bottom: 6px;
+  }
+  .pub-meta {
+    font-size: 10px; color: var(--accent-dim);
+    letter-spacing: .05em; margin-bottom: 8px;
+  }
+  .pub-authors { font-size: 11px; color: var(--sub); line-height: 1.7; }
+  .pub-row {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; gap: 12px; margin-bottom: 6px;
+  }
+
+  /* ── PROJECTS GRID ── */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px,1fr));
+    gap: 14px;
+  }
+  .proj-head {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; margin-bottom: 8px;
+  }
+  .proj-title {
+    font-size: 14px; color: var(--heading);
+    font-weight: 700; letter-spacing: .03em;
+  }
+  .proj-cipher { font-size: 9px; color: var(--dim); letter-spacing: .10em; }
+  .proj-desc {
+    font-size: 12px; color: var(--sub);
+    line-height: 1.7; margin-bottom: 4px;
+  }
+  .proj-demo {
+    display: inline-block; margin-top: 12px;
+    font-size: 9px; color: var(--accent);
+    border: 1px solid var(--badge-b);
+    padding: 3px 10px; letter-spacing: .08em;
+    text-decoration: none;
+    transition: background .15s;
+  }
+  .proj-demo:hover { background: var(--badge); }
+
+  /* ── SKILLS ── */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+    gap: 12px;
+  }
+  .skill-cat {
+    font-size: 9px; color: var(--dim);
+    letter-spacing: .12em; margin-bottom: 12px;
+  }
+
+  /* ── CONTACT ── */
+  .contact-list { max-width: 480px; }
+  .contact-row {
+    display: flex; align-items: center; gap: 18px;
+    border: 1px solid var(--line);
+    background: var(--card); padding: 13px 18px;
+    margin-bottom: 8px; transition: border-color .15s;
+    text-decoration: none;
+  }
+  .contact-row:hover { border-color: var(--accent-dim); }
+  .contact-key { font-size: 9px; color: var(--dim); min-width: 75px; letter-spacing: .10em; }
+  .contact-val { font-size: 12px; color: var(--body); }
+
+  /* ── FOOTER CIPHER ── */
+  .cipher-footer {
+    margin-top: 48px; padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-size: 9px; color: var(--ghost);
+    letter-spacing: .15em;
+    display: flex; justify-content: space-between;
+  }
+  .cipher-footer span:last-child { color: var(--dim); }
+
+  /* ── DIVIDER ── */
+  hr.matrix { border: none; border-top: 1px solid var(--line); margin: 24px 0; }
+
+  /* ── EDUCATION ROW ── */
+  .edu-row { margin-bottom: 6px; }
+  .edu-deg  { font-size: 13px; color: var(--heading); font-weight: 700; letter-spacing: .02em; }
+  .edu-inst { font-size: 11px; color: var(--accent-dim); margin: 3px 0 1px; }
+  .edu-meta { font-size: 10px; color: var(--sub); }
+
+  /* ── CERT ROW ── */
+  .cert-row {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 11px; color: var(--sub); padding: 7px 0;
+    border-bottom: 1px solid var(--ghost);
+  }
+  .cert-row:last-child { border: none; }
+  .cert-dot { color: var(--accent-dim); }
+
+  /* ── MOBILE ── */
+  @media (max-width: 620px) {
+    nav { padding: 0 14px; }
+    .nav-host { display: none; }
+    .nav-tab { padding: 0 8px; font-size: 9px; }
+    .nav-badge { display: none; }
+    .section { padding: 72px 16px 60px; }
+    .glitch { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Matrix Rain -->
+<canvas id="matrix-canvas"></canvas>
+
+<!-- ── NAVBAR ── -->
+<nav>
+  <div class="nav-dots">
+    <div class="dot red"></div>
+    <div class="dot yellow"></div>
+    <div class="dot green"></div>
+  </div>
+  <span class="nav-host">ZION-TERMINAL // saif@nebuchadnezzar</span>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="show('home')">    /home</button>
+    <button class="nav-tab"        onclick="show('research')">/research</button>
+    <button class="nav-tab"        onclick="show('projects')">/projects</button>
+    <button class="nav-tab"        onclick="show('skills')"  >/skills</button>
+    <button class="nav-tab"        onclick="show('contact')" >/contact</button>
+  </div>
+  <span class="nav-badge">MATRIX v4.2</span>
+</nav>
+
+<div class="page">
+
+  <!-- ══════════════════════════════════════════════════════════
+       HOME
+  ══════════════════════════════════════════════════════════ -->
+  <section id="home" class="section active">
+    <div class="boot">
+      <div class="boot-line"><span class="boot-arrow">&gt; </span><span class="boot-text">CONNECTING TO THE CONSTRUCT...</span></div>
+      <div class="boot-line"><span class="boot-arrow">&gt; </span><span class="boot-text">DECRYPTING IDENTITY MATRIX...</span></div>
+      <div class="boot-line"><span class="boot-arrow">&gt; </span><span class="boot-ok">AGENT PROFILE LOADED. WELCOME.</span></div>
+    </div>
+
+    <div class="hero-bar">
+      <div class="glitch" id="glitch-name">SAIF MOSTASIR ROHAN</div>
+      <p class="hero-role">CV_RESEARCHER &nbsp;→&nbsp; AI_ENGINEER &nbsp;→&nbsp; AI_DEVELOPER</p>
+      <p class="hero-loc">AIUB · CGPA 3.91/4.00 · GAZIPUR_NODE // SECTOR_BD</p>
+    </div>
+
+    <div class="status-grid">
+      <div class="status-box">
+        <div class="status-key">STATUS</div>
+        <div class="status-val">BSc Graduate (Summer 2024–25)</div>
+      </div>
+      <div class="status-box">
+        <div class="status-key">MISSION</div>
+        <div class="status-val accent">Applying PhD/MS 2026–27</div>
+      </div>
+      <div class="status-box">
+        <div class="status-key">PUBLICATIONS</div>
+        <div class="status-val gold">14 Papers · IEEE · Springer · Taylor&Francis</div>
+      </div>
+      <div class="status-box">
+        <div class="status-key">FOCUS</div>
+        <div class="status-val">Computer Vision · Medical AI · XAI</div>
+      </div>
+      <div class="status-box">
+        <div class="status-key">IELTS</div>
+        <div class="status-val">Overall 7.5 (R:8.5 L:7.5)</div>
+      </div>
+      <div class="status-box">
+        <div class="status-key">CLEARANCE</div>
+        <div class="status-val accent">LEVEL_04 // CONSTRUCT_ACCESS</div>
+      </div>
+    </div>
+
+    <hr class="matrix">
+    <p class="sec-label">// ABOUT</p>
+    <p class="about-text">
+      I'm an AI researcher and engineer specialising in computer vision, medical imaging, and explainable AI.
+      I graduated from AIUB with a 3.91 CGPA and have 14 peer-reviewed publications across IEEE, Springer LNCS,
+      and Taylor &amp; Francis. My work spans disease diagnosis, gesture-based HCI, and nature-inspired optimisation.
+      Currently transitioning into applied AI development — building production tools powered by LLMs and vision models.
+      Actively applying for PhD/MS programs in 2026–27.
+    </p>
+
+    <div class="prompt">
+      <span class="prompt-user">saif@nebuchadnezzar</span>
+      <span class="prompt-sym">:~$</span>
+      <span class="cursor">█</span>
+    </div>
+
+    <div class="cipher-footer">
+      <span>// FREE_YOUR_MIND</span>
+      <span>THERE_IS_NO_SPOON</span>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       RESEARCH
+  ══════════════════════════════════════════════════════════ -->
+  <section id="research" class="section">
+    <p class="sec-label">// PEER_REVIEWED_PUBLICATIONS</p>
+    <h2 class="sec-title">RESEARCH OUTPUT</h2>
+
+    <!-- HCII 2026 -->
+    <div class="card accent-left">
+      <div class="pub-row">
+        <div class="pub-title">ReedMap: A Tangible Interaction System for Context-Aware and Division-Based Map Navigation</div>
+        <span class="badge">ACCEPTED</span>
+      </div>
+      <div class="pub-meta">HCII 2026 · Springer LNCS · Montreal, Canada · Paper #499</div>
+      <div class="pub-authors">S. M. Rohan, T. I. Sheikh, F. B. Zaman, M. Ahmed, M. S. Kabir, K. T. Hasan</div>
+    </div>
+
+    <div class="card accent-left">
+      <div class="pub-row">
+        <div class="pub-title">AirTune: A Tangible Interaction System for Gesture-Based and Contactless Media Control</div>
+        <span class="badge">ACCEPTED</span>
+      </div>
+      <div class="pub-meta">HCII 2026 · Springer LNCS · Montreal, Canada · Paper #2763</div>
+      <div class="pub-authors">T. I. Sheikh, S. M. Rohan, N. Aziz, S. F. Mahbub, A. Amin, K. T. Hasan</div>
+    </div>
+
+    <hr class="matrix">
+
+    <!-- IEEE -->
+    <div class="card">
+      <div class="pub-row">
+        <div class="pub-title">XGception: Unveiling Mosquito Larvae Patterns with XAI</div>
+        <span class="badge">IEEE</span>
+      </div>
+      <div class="pub-meta">ICCIT 2025 · Cox's Bazar, Bangladesh</div>
+      <div class="pub-authors">S. M. Rohan, S. S. Rafith, M. S. Kabir, M. H. Pranto, T. Bhuiyan, K. Tanvir</div>
+    </div>
+
+    <div class="card">
+      <div class="pub-row">
+        <div class="pub-title">FractureNet: Hybrid Transformer-Ensemble Architecture for Bone Fracture Detection in Multi-Region X-ray Images</div>
+        <span class="badge">IEEE</span>
+      </div>
+      <div class="pub-meta">FET'26 · International Conference of Frontiers of Engineering and Emerging Technologies</div>
+      <div class="pub-authors">S. S. Rafith, S. M. Rohan, M. S. Kabir, M. F. K. Chowdhury, A. Nahar</div>
+    </div>
+
+    <div class="card">
+      <div class="pub-row">
+        <div class="pub-title">Explainable Breast Cancer Diagnosis with Vision Transformers and ACOR-Optimized Decision Trees</div>
+        <span class="badge">IEEE</span>
+      </div>
+      <div class="pub-meta">ICCIT 2025 · Cox's Bazar, Bangladesh</div>
+      <div class="pub-authors">S. S. Rafith, S. M. Rohan, M. S. Kabir, K. Tanvir, D. Gomes, M. Rahman</div>
+    </div>
+
+    <div class="card">
+      <div class="pub-row">
+        <div class="pub-title">Explainable Wildfire Classification with PVT and Dragonfly-Optimized Decision Trees</div>
+        <span class="badge">IEEE</span>
+      </div>
+      <div class="pub-meta">ICCIT 2025 · Cox's Bazar, Bangladesh</div>
+      <div class="pub-authors">S. S. Rafith, S. M. Rohan, M. S. Kabir, T. S. Sintheia, N. S. B. Alam, K. Tanvir</div>
+    </div>
+
+    <div class="card">
+      <div class="pub-row">
+        <div class="pub-title">Capsule Endoscopy Image Classification using ResNeXt &amp; VCS-Optimized KNN with XAI</div>
+        <span class="badge">IEEE</span>
+      </div>
+      <div class="pub-meta">SPICSCON 2025 · Rajshahi, Bangladesh</div>
+      <div class="pub-authors">A. D. Sarker, S. M. Rohan, M. F. K. Chowdhury, S. S. Rafith, N. Fahim, M. S. Kabir</div>
+    </div>
+
+    <div class="card">
+      <div class="pub-row">
+        <div class="pub-title">Colonoscopy Classification using PVT-Xception Ensemble Framework with Explainable AI</div>
+        <span class="badge">IEEE</span>
+      </div>
+      <div class="pub-meta">BECITHCON 2025 · Dhaka, Bangladesh</div>
+      <div class="pub-authors">N. Fahim, S. S. Rafith, M. F. K. Chowdhury, S. M. Rohan, A. D. Sarker, M. S. Kabir</div>
+    </div>
+
+    <div class="card">
+      <div class="pub-row">
+        <div class="pub-title">Blood Cancer Classification from Microscopic Images via ViTResNetEnsemble with XAI</div>
+        <span class="badge">IEEE</span>
+      </div>
+      <div class="pub-meta">WIE WIECON-ECE 2025 · Dhaka, Bangladesh</div>
+      <div class="pub-authors">T. S. Sintheia, M. Rahman, B. Sutrudhar, S. M. Rohan, M. M. Rassel, M. S. Kabir</div>
+    </div>
+
+    <div class="card">
+      <div class="pub-row">
+        <div class="pub-title">AI-Driven Hybrid Approach to Optimizing Dragonfruit Quality Assessment for Sustainable Agriculture</div>
+        <span class="badge">IEEE</span>
+      </div>
+      <div class="pub-meta">ICCIT 2024</div>
+      <div class="pub-authors">M. F. K. Chowdhury, M. S. Kabir, S. M. Rohan, K. M. T. Kabir, K. Tanvir, M. M. Rahman</div>
+    </div>
+
+    <div class="card">
+      <div class="pub-row">
+        <div class="pub-title">Enhancing Lemon Quality Detection using Efficient-MobileNet with Explainable AI</div>
+        <span class="badge">IEEE</span>
+      </div>
+      <div class="pub-meta">ECCE 2025</div>
+      <div class="pub-authors">M. Rakibuzzman, S. M. Rohan, T. S. Sintheia, M. S. Kabir, M. M. Rassel, K. Tanvir</div>
+    </div>
+
+    <hr class="matrix">
+
+    <!-- Other -->
+    <div class="card">
+      <div class="pub-row">
+        <div class="pub-title">Enhancing Jackfruit Leaf Diseases Classification using Res-NASNet Model with XAI</div>
+        <span class="badge gold">T&amp;F BOOK</span>
+      </div>
+      <div class="pub-meta">BIM 2025 · Taylor &amp; Francis Book Chapter</div>
+      <div class="pub-authors">M. F. K. Chowdhury, M. S. Kabir, T. S. Sintheia, S. M. Rohan, K. Tanvir, D. Gomes</div>
+    </div>
+
+    <div class="card">
+      <div class="pub-row">
+        <div class="pub-title">Ovarian Cancer Detection Using MobileNetV2 with GA-Optimized KNN and Explainable AI</div>
+        <span class="badge gold">T&amp;F BOOK</span>
+      </div>
+      <div class="pub-meta">IDAA 2025 · Taylor &amp; Francis Book Chapter</div>
+      <div class="pub-authors">M. M. Rassel, B. Sutrudhar, L. Somoddar, M. S. Kabir, A. D. Sarker, S. M. Rohan</div>
+    </div>
+
+    <div class="card">
+      <div class="pub-row">
+        <div class="pub-title">Mitigating Misdiagnosis Challenges in Bangladesh's Healthcare System with AI-Based Application</div>
+        <span class="badge gold">JOURNAL</span>
+      </div>
+      <div class="pub-meta">Journal of Reproducible Research · Vol. 2, No. 3, 2024</div>
+      <div class="pub-authors">S. M. Rohan, M. Ahmed, K. Redwan, M. S. Kabir, T. S. Sintheia, K. Tanvir, M. K. Haq, V. Raju</div>
+    </div>
+
+    <div class="cipher-footer">
+      <span>// RESEARCH_NODE</span>
+      <span>14 PUBLICATIONS</span>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       PROJECTS
+  ══════════════════════════════════════════════════════════ -->
+  <section id="projects" class="section">
+    <p class="sec-label">// ACTIVE_OPERATIONS</p>
+    <h2 class="sec-title">PROJECTS</h2>
+
+    <div class="projects-grid">
+
+      <!-- ── DEMO PROJECT: AI TOOL ── -->
+      <div class="card">
+        <div class="proj-head">
+          <div class="proj-title">MediScan AI</div>
+          <span class="badge">LIVE DEMO</span>
+        </div>
+        <p class="proj-desc">
+          A web-based medical image analysis tool powered by a fine-tuned CNN. Upload a chest X-ray
+          or skin image and receive a real-time XAI explanation with Grad-CAM heatmap overlays.
+          Built as an end-to-end AI application — model inference + visual explanation in the browser.
+        </p>
+        <div class="tags">
+          <span class="tag">PyTorch</span>
+          <span class="tag">Grad-CAM</span>
+          <span class="tag">FastAPI</span>
+          <span class="tag">React</span>
+          <span class="tag">XAI</span>
+        </div>
+        <!-- Replace # with your actual demo URL when ready -->
+        <a class="proj-demo" href="#" target="_blank">&gt; LAUNCH_DEMO</a>
+      </div>
+
+      <!-- ── RESEARCH PROJECT 1 ── -->
+      <div class="card">
+        <div class="proj-head">
+          <div class="proj-title">Breast Cancer Dx</div>
+          <span class="proj-cipher">[BC-DX]</span>
+        </div>
+        <p class="proj-desc">
+          Explainable AI breast cancer diagnosis using Vision Transformers paired with
+          ACOR-optimised decision trees. Grad-CAM overlays highlight tumour regions for clinical
+          interpretability. Accepted at ICCIT 2025 (IEEE).
+        </p>
+        <div class="tags">
+          <span class="tag">Vision Transformers</span>
+          <span class="tag">XAI</span>
+          <span class="tag">Grad-CAM</span>
+          <span class="tag">ACOR</span>
+          <span class="tag">PyTorch</span>
+        </div>
+      </div>
+
+      <!-- ── RESEARCH PROJECT 2 ── -->
+      <div class="card">
+        <div class="proj-head">
+          <div class="proj-title">Colonoscopy AI</div>
+          <span class="proj-cipher">[COL-AI]</span>
+        </div>
+        <p class="proj-desc">
+          Polyp classification using PVT-Xception ensemble framework with explainability layer.
+          Validated on colonoscopy datasets with high sensitivity for pre-cancerous lesion detection.
+          Accepted at BECITHCON 2025 (IEEE).
+        </p>
+        <div class="tags">
+          <span class="tag">PVT</span>
+          <span class="tag">Xception</span>
+          <span class="tag">Ensemble</span>
+          <span class="tag">XAI</span>
+          <span class="tag">Medical Imaging</span>
+        </div>
+      </div>
+
+      <!-- ── RESEARCH PROJECT 3 ── -->
+      <div class="card">
+        <div class="proj-head">
+          <div class="proj-title">ReedMap</div>
+          <span class="proj-cipher">[HCI-01]</span>
+        </div>
+        <p class="proj-desc">
+          Tangible interaction system for context-aware map navigation using physical reed-based
+          controllers. Integrates division-based spatial reasoning for accessibility.
+          Accepted at HCII 2026 — Springer LNCS.
+        </p>
+        <div class="tags">
+          <span class="tag">HCI</span>
+          <span class="tag">Tangible UI</span>
+          <span class="tag">AR</span>
+          <span class="tag">Accessibility</span>
+        </div>
+      </div>
+
+      <!-- ── RESEARCH PROJECT 4 ── -->
+      <div class="card">
+        <div class="proj-head">
+          <div class="proj-title">AirTune</div>
+          <span class="proj-cipher">[HCI-02]</span>
+        </div>
+        <p class="proj-desc">
+          Gesture-based contactless media control system using computer vision pipeline for
+          real-time hand tracking. No physical controller required. Accepted at HCII 2026 — Springer LNCS.
+        </p>
+        <div class="tags">
+          <span class="tag">Gesture Recognition</span>
+          <span class="tag">OpenCV</span>
+          <span class="tag">HCI</span>
+          <span class="tag">MediaPipe</span>
+        </div>
+      </div>
+
+      <!-- ── RESEARCH PROJECT 5 ── -->
+      <div class="card">
+        <div class="proj-head">
+          <div class="proj-title">FractureNet</div>
+          <span class="proj-cipher">[FRAC-DX]</span>
+        </div>
+        <p class="proj-desc">
+          Hybrid Transformer-Ensemble architecture for bone fracture detection across multiple
+          X-ray regions (wrist, spine, hip). Achieves high precision via multi-scale feature fusion.
+          Accepted at FET'26 (IEEE).
+        </p>
+        <div class="tags">
+          <span class="tag">Transformer</span>
+          <span class="tag">Ensemble</span>
+          <span class="tag">X-ray</span>
+          <span class="tag">PyTorch</span>
+        </div>
+      </div>
+
+    </div><!-- /projects-grid -->
+
+    <div class="cipher-footer">
+      <span>// OPERATIONS_LOG</span>
+      <span>6 PROJECTS ACTIVE</span>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       SKILLS
+  ══════════════════════════════════════════════════════════ -->
+  <section id="skills" class="section">
+    <p class="sec-label">// CAPABILITIES_MATRIX</p>
+    <h2 class="sec-title">SKILLS &amp; BACKGROUND</h2>
+
+    <div class="skills-grid" style="margin-bottom:32px">
+      <div class="card">
+        <div class="skill-cat">LANGUAGES</div>
+        <div class="tags">
+          <span class="tag">Python</span><span class="tag">R</span>
+          <span class="tag">C/C++</span><span class="tag">JavaScript</span>
+          <span class="tag">SQL</span><span class="tag">MATLAB</span>
+          <span class="tag">HTML/PHP</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="skill-cat">ML / DL FRAMEWORKS</div>
+        <div class="tags">
+          <span class="tag">PyTorch</span><span class="tag">TensorFlow</span>
+          <span class="tag">Keras</span><span class="tag">Scikit-learn</span>
+          <span class="tag">NumPy</span><span class="tag">Pandas</span>
+          <span class="tag">Ultralytics</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="skill-cat">COMPUTER VISION</div>
+        <div class="tags">
+          <span class="tag">OpenCV</span><span class="tag">Grad-CAM</span>
+          <span class="tag">U-Net</span><span class="tag">YOLO</span>
+          <span class="tag">Vision Transformers</span>
+          <span class="tag">MediaPipe</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="skill-cat">AI DEVELOPMENT</div>
+        <div class="tags">
+          <span class="tag">FastAPI</span><span class="tag">React</span>
+          <span class="tag">LLM APIs</span><span class="tag">Gradio</span>
+          <span class="tag">Hugging Face</span><span class="tag">Git</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="skill-cat">DESIGN TOOLS</div>
+        <div class="tags">
+          <span class="tag">Figma</span><span class="tag">Adobe PS</span>
+          <span class="tag">Adobe AI</span><span class="tag">Canva</span>
+          <span class="tag">LaTeX</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="skill-cat">OS / OTHER</div>
+        <div class="tags">
+          <span class="tag">Linux (Ubuntu)</span><span class="tag">macOS</span>
+          <span class="tag">Windows</span><span class="tag">Google Colab</span>
+          <span class="tag">Kaggle</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="matrix">
+    <p class="sec-label" style="margin-bottom:16px">// EDUCATION</p>
+
+    <div class="card edu-row">
+      <div class="edu-deg">BSc in Computer Science &amp; Engineering</div>
+      <div class="edu-inst">American International University-Bangladesh (AIUB) · Dhaka</div>
+      <div class="edu-meta">Major: Information Systems &nbsp;|&nbsp; CGPA: 3.91/4.00 &nbsp;|&nbsp; Graduate: Summer 2024–25 &nbsp;|&nbsp; Credits: 148</div>
+      <div class="tags" style="margin-top:8px">
+        <span class="badge gold">DEAN'S LIST</span>
+        <span class="badge" style="margin-left:4px">60% SCHOLARSHIP</span>
+        <span class="badge gold" style="margin-left:4px">BEST POSTER — AI CATEGORY</span>
+      </div>
+    </div>
+    <div class="card edu-row">
+      <div class="edu-deg">Higher Secondary Certificate (HSC) — Science</div>
+      <div class="edu-inst">M. E. H. Arif College · Gazipur, Bangladesh</div>
+      <div class="edu-meta">2020 &nbsp;|&nbsp; GPA: 5.00/5.00</div>
+    </div>
+    <div class="card edu-row">
+      <div class="edu-deg">Secondary School Certificate (SSC) — Science</div>
+      <div class="edu-inst">Rani Bilasmoni Govt. Boys' High School Joydebpur · Gazipur, Bangladesh</div>
+      <div class="edu-meta">2018 &nbsp;|&nbsp; GPA: 5.00/5.00</div>
+    </div>
+
+    <hr class="matrix">
+    <p class="sec-label" style="margin-bottom:16px">// CERTIFICATIONS</p>
+    <div class="card">
+      <div class="cert-row"><span class="cert-dot">▶</span> Machine Learning Specialization — Coursera</div>
+      <div class="cert-row"><span class="cert-dot">▶</span> Deep Learning Specialization — Coursera</div>
+      <div class="cert-row"><span class="cert-dot">▶</span> Google Data Analytics — Coursera</div>
+      <div class="cert-row"><span class="cert-dot">▶</span> Google Advanced Data Analytics — Coursera</div>
+    </div>
+
+    <hr class="matrix">
+    <p class="sec-label" style="margin-bottom:16px">// EXPERIENCE</p>
+    <div class="card accent-left">
+      <div class="pub-row">
+        <div class="pub-title">Teaching Assistant</div>
+        <span class="badge">2024–2025</span>
+      </div>
+      <div class="pub-meta">AIUB, Dhaka, Bangladesh · Summer 2024–2025</div>
+      <div class="pub-authors">Supervisor: Prof. Dr. Afroza Nahar</div>
+    </div>
+
+    <hr class="matrix">
+    <p class="sec-label" style="margin-bottom:16px">// LANGUAGE_SKILLS</p>
+    <div class="card">
+      <div style="display:flex;gap:32px;flex-wrap:wrap;font-size:11px">
+        <div>
+          <div class="status-key">BENGALI</div>
+          <div style="color:var(--body)">Native Fluency</div>
+        </div>
+        <div>
+          <div class="status-key">ENGLISH</div>
+          <div style="color:var(--body)">Native Fluency</div>
+        </div>
+        <div>
+          <div class="status-key">IELTS OVERALL</div>
+          <div style="color:var(--gold)">7.5 &nbsp;(R:8.5 · L:7.5 · W:6.5 · S:6.5)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cipher-footer">
+      <span>// SKILLS_LOGGED</span>
+      <span>FULL_STACK_AI</span>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════
+       CONTACT
+  ══════════════════════════════════════════════════════════ -->
+  <section id="contact" class="section">
+    <p class="sec-label">// ESTABLISH_CONNECTION</p>
+    <h2 class="sec-title">CONTACT</h2>
+
+    <div class="contact-list">
+      <!-- ✏ UPDATE THESE LINKS with your real GitHub / LinkedIn URLs -->
+      <a class="contact-row" href="mailto:saifmostasirrohan44@gmail.com">
+        <span class="contact-key">EMAIL</span>
+        <span class="contact-val">saifmostasirrohan44@gmail.com</span>
+      </a>
+      <a class="contact-row" href="tel:+8801740784444">
+        <span class="contact-key">PHONE</span>
+        <span class="contact-val">+880 17407-84444</span>
+      </a>
+      <a class="contact-row" href="https://github.com/saifmostasirrohan" target="_blank">
+        <span class="contact-key">GITHUB</span>
+        <span class="contact-val">https://github.com/saifmostasirrohan &nbsp;←&nbsp; update me</span>
+      </a>
+      <a class="contact-row" href="https://www.linkedin.com/in/saif-mostasir-rohan-48a74728b" target="_blank">
+        <span class="contact-key">LINKEDIN</span>
+        <span class="contact-val">https://www.linkedin.com/in/saif-mostasir-rohan-48a74728b &nbsp;←&nbsp; update me</span>
+      </a>
+      <a class="contact-row" href="https://scholar.google.com/citations?user=mkikv5EAAAAJ&hl=en" target="_blank">
+        <span class="contact-key">GOOGLE SCHOLAR</span>
+        <span class="contact-val">https://scholar.google.com/citations?user=mkikv5EAAAAJ&hl=en &nbsp;←&nbsp; update me</span>
+      </a>
+      <div class="contact-row" style="text-decoration:none">
+        <span class="contact-key">LOCATION</span>
+        <span class="contact-val">264/1, Chowrasta, Gazipur-1702, Bangladesh</span>
+      </div>
+    </div>
+
+    <hr class="matrix" style="max-width:480px;margin-top:28px">
+
+    <p class="sec-label" style="margin-top:24px;margin-bottom:14px">// SUPERVISORS &amp; REFERENCES</p>
+    <div style="max-width:480px">
+      <div class="card">
+        <div class="pub-title" style="font-size:13px">Prof. Dr. Khandaker Tabin Hasan</div>
+        <div class="pub-meta">Head (Graduate Program), Dept. of Computer Science, AIUB · Dhaka</div>
+        <div class="pub-authors">tabin@aiub.edu</div>
+      </div>
+      <div class="card">
+        <div class="pub-title" style="font-size:13px">Prof. Dr. Afroza Nahar</div>
+        <div class="pub-meta">Professor, Dept. of Computer Science, AIUB · Dhaka</div>
+        <div class="pub-authors">afroza@aiub.edu</div>
+      </div>
+    </div>
+
+    <div class="prompt">
+      <span class="prompt-user">saif@nebuchadnezzar</span>
+      <span class="prompt-sym">:~$</span>
+      <span class="cursor">█</span>
+    </div>
+
+    <div class="cipher-footer">
+      <span>// FREE_YOUR_MIND</span>
+      <span>THERE_IS_NO_SPOON</span>
+    </div>
+  </section>
+
+</div><!-- /page -->
+
+<!-- ══════════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════ -->
+<script>
+// ── Tab navigation ──────────────────────────────────────────
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(b => {
+    if (b.textContent.trim() === '/' + id) b.classList.add('active');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Matrix rain ─────────────────────────────────────────────
+(function () {
+  const canvas = document.getElementById('matrix-canvas');
+  const ctx    = canvas.getContext('2d');
+  const chars  = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ01アBCDEF#@!%';
+  const fontSize = 13;
+  let W, H, cols, drops;
+
+  function init() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    cols  = Math.floor(W / fontSize);
+    drops = Array(cols).fill(0).map(() => Math.random() * -80);
+  }
+  init();
+  window.addEventListener('resize', init);
+
+  setInterval(function () {
+    ctx.fillStyle = 'rgba(0,3,0,0.05)';
+    ctx.fillRect(0, 0, W, H);
+    for (let i = 0; i < cols; i++) {
+      const ch = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillStyle = Math.random() > 0.97 ? '#ffffff'
+                    : Math.random() > 0.85  ? '#39FF14' : '#00AA44';
+      ctx.font = fontSize + "px 'Courier New', monospace";
+      ctx.fillText(ch, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > H && Math.random() > 0.975) drops[i] = 0;
+      drops[i] += 0.45;
+    }
+  }, 40);
+})();
+
+// ── Glitch effect on name ────────────────────────────────────
+(function () {
+  const el      = document.getElementById('glitch-name');
+  if (!el) return;
+  const original = el.textContent;
+  const chars    = 'アイウエオ01#@!%XYZ';
+
+  function run() {
+    let n = 0;
+    const iv = setInterval(() => {
+      if (n++ > 8) { el.textContent = original; clearInterval(iv); return; }
+      el.textContent = original.split('').map(c =>
+        Math.random() > 0.75 ? chars[Math.floor(Math.random() * chars.length)] : c
+      ).join('');
+    }, 60);
+  }
+  setInterval(run, 4500);
+})();
+</script>
+</body>
+</html>

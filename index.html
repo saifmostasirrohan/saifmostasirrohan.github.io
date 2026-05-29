@@ -536,6 +536,13 @@
     display:inline-block;
   }
   .pub-link:hover { background:rgba(57,255,20,.18); }
+  .pub-link.muted {
+    color:var(--dim);
+    border-color:var(--ghost);
+    background:transparent;
+    text-shadow:none;
+    cursor:default;
+  }
   .pub-note {
     font-size:13px;
     color:var(--dim);
@@ -784,15 +791,22 @@
     I build practical AI systems that connect research depth with deployable engineering. My current work focuses on
     autonomous agents, RAG pipelines, LLM-powered applications, FastAPI backends, Streamlit interfaces, and production-ready
     AI workflows. I also bring a strong research background in computer vision, medical AI, and explainable AI with
-    14 peer-reviewed publications across IEEE, Springer LNCS, and Taylor &amp; Francis.
+    15 publications across IEEE, Springer LNCS, Taylor &amp; Francis, and journal venues.
   </p>
 
-  <div class="hero-actions">
-    <button class="proj-link primary" type="button" onclick="show('engineering')">&gt; VIEW_BUILDS</button>
-    <a class="proj-link secondary" href="assets/cv/Saif_Mostasir_Rohan_CV.pdf" target="_blank" rel="noopener">&gt; VIEW_CV</a>
-    <a class="proj-link secondary" href="assets/cv/Saif_Mostasir_Rohan_CV.pdf" download>&gt; DOWNLOAD_CV</a>
-    <button class="proj-link secondary" type="button" onclick="show('contact')">&gt; CONTACT</button>
-  </div>
+<div class="hero-actions">
+  <a class="proj-link primary" href="assets/cv/Saif_Mostasir_Rohan_CV.pdf" target="_blank" rel="noopener">
+    &gt; VIEW_CV
+  </a>
+
+  <a class="proj-link secondary" href="assets/cv/Saif_Mostasir_Rohan_CV.pdf" download>
+    &gt; DOWNLOAD_CV
+  </a>
+
+  <button class="proj-link secondary" onclick="show('engineering')" type="button">
+    &gt; VIEW_PROJECTS
+  </button>
+</div>
 
   <div class="feat-label">// FEATURED_BUILDS &nbsp; [DEPLOYED + BUILDING_IN_PUBLIC]</div>
 
@@ -856,7 +870,7 @@
       </div>
       <div class="feat-proj-links">
         <span class="proj-link orange-link" style="cursor:default; opacity:.75">&gt; DEPLOYING_SOON</span>
-        <a class="proj-link secondary" href="https://github.com/saifmostasirrohan" target="_blank" rel="noopener">&gt; SOURCE</a>
+        <span class="proj-link secondary" style="cursor:default;opacity:.75;">&gt; SOURCE_SOON</span><!-- Replace with FinSight repo link when published -->
       </div>
     </div>
   </div>
@@ -872,11 +886,11 @@
     </div>
     <div class="status-box">
       <div class="status-key">RESEARCH</div>
-      <div class="status-val gold">14 Papers · CV · Medical AI · XAI</div>
+      <div class="status-val gold">15 Publications · CV · Medical AI · XAI</div>
     </div>
     <div class="status-box">
       <div class="status-key">OPEN TO</div>
-      <div class="status-val cyan">AI roles · Collaborations · PhD/MS 2026</div>
+      <div class="status-val cyan">AI roles · Research collabs · PhD track</div>
     </div>
   </div>
 
@@ -1074,7 +1088,7 @@
 
     <div class="eng-links">
       <span class="proj-link orange-link" style="cursor:default;opacity:.75;">&gt; DEPLOYING_SOON</span>
-      <a class="proj-link secondary" href="https://github.com/saifmostasirrohan" target="_blank" rel="noopener">&gt; GITHUB</a>
+      <span class="proj-link secondary" style="cursor:default;opacity:.75;">&gt; GITHUB_SOON</span><!-- Replace with FinSight repo link when published -->
     </div>
   </div>
 
@@ -1090,28 +1104,27 @@
   <h2 class="sec-title">RESEARCH OUTPUT</h2>
 
   <p class="pub-note">
-    Add direct IEEE / Springer / Taylor &amp; Francis / DOI / Google Scholar links to the paper buttons below.
-    Replace each <strong>href="#"</strong> with the actual paper URL when it becomes available.
+    Selected publications in computer vision, medical AI, explainable AI, HCI, agriculture AI, and AI-enabled public systems. Paper buttons open official publisher or journal pages where available.
   </p>
 
   <div class="card accent-left">
     <div class="pub-row">
-      <div class="pub-title"><a href="#" target="_blank" rel="noopener">ReedMap: A Tangible Interaction System for Context-Aware and Division-Based Map Navigation</a></div>
+      <div class="pub-title">ReedMap: A Tangible Interaction System for Context-Aware and Division-Based Map Navigation</div>
       <span class="badge">ACCEPTED</span>
     </div>
     <div class="pub-meta">HCII 2026 &middot; Springer LNCS &middot; Montreal, Canada &middot; Paper #499</div>
     <div class="pub-authors">S. M. Rohan, T. I. Sheikh, F. B. Zaman, M. Ahmed, M. S. Kabir, K. T. Hasan</div>
-    <div class="pub-actions"><a class="pub-link" href="#" target="_blank" rel="noopener">&gt; PAPER_LINK</a></div>
+    <div class="pub-actions"><span class="pub-link muted">&gt; LINK_PENDING</span></div>
   </div>
 
   <div class="card accent-left">
     <div class="pub-row">
-      <div class="pub-title"><a href="#" target="_blank" rel="noopener">AirTune: A Tangible Interaction System for Gesture-Based and Contactless Media Control</a></div>
+      <div class="pub-title">AirTune: A Tangible Interaction System for Gesture-Based and Contactless Media Control</div>
       <span class="badge">ACCEPTED</span>
     </div>
     <div class="pub-meta">HCII 2026 &middot; Springer LNCS &middot; Montreal, Canada &middot; Paper #2763</div>
     <div class="pub-authors">T. I. Sheikh, S. M. Rohan, N. Aziz, S. F. Mahbub, A. Amin, K. T. Hasan</div>
-    <div class="pub-actions"><a class="pub-link" href="#" target="_blank" rel="noopener">&gt; PAPER_LINK</a></div>
+    <div class="pub-actions"><span class="pub-link muted">&gt; LINK_PENDING</span></div>
   </div>
 
   <hr class="matrix">
@@ -1128,12 +1141,12 @@
 
   <div class="card">
     <div class="pub-row">
-      <div class="pub-title"><a href="#" target="_blank" rel="noopener">FractureNet: Hybrid Transformer-Ensemble Architecture for Bone Fracture Detection in Multi-Region X-ray Images</a></div>
+      <div class="pub-title">FractureNet: Hybrid Transformer-Ensemble Architecture for Bone Fracture Detection in Multi-Region X-ray Images</div>
       <span class="badge">IEEE</span>
     </div>
     <div class="pub-meta">FET'26 &middot; International Conference of Frontiers of Engineering and Emerging Technologies</div>
     <div class="pub-authors">S. S. Rafith, S. M. Rohan, M. S. Kabir, M. F. K. Chowdhury, A. Nahar</div>
-    <div class="pub-actions"><a class="pub-link" href="#" target="_blank" rel="noopener">&gt; PAPER_LINK</a></div>
+    <div class="pub-actions"><span class="pub-link muted">&gt; LINK_PENDING</span></div>
   </div>
 
   <div class="card">
@@ -1210,22 +1223,22 @@
 
   <div class="card">
     <div class="pub-row">
-      <div class="pub-title"><a href="#" target="_blank" rel="noopener">Enhancing Jackfruit Leaf Diseases Classification using Res-NASNet Model with XAI</a></div>
+      <div class="pub-title">Enhancing Jackfruit Leaf Diseases Classification using Res-NASNet Model with XAI</div>
       <span class="badge gold">T&amp;F BOOK</span>
     </div>
     <div class="pub-meta">BIM 2025 &middot; Taylor &amp; Francis Book Chapter</div>
     <div class="pub-authors">M. F. K. Chowdhury, M. S. Kabir, T. S. Sintheia, S. M. Rohan, K. Tanvir, D. Gomes</div>
-    <div class="pub-actions"><a class="pub-link" href="#" target="_blank" rel="noopener">&gt; PAPER_LINK</a></div>
+    <div class="pub-actions"><span class="pub-link muted">&gt; LINK_PENDING</span></div>
   </div>
 
   <div class="card">
     <div class="pub-row">
-      <div class="pub-title"><a href="#" target="_blank" rel="noopener">Ovarian Cancer Detection Using MobileNetV2 with GA-Optimized KNN and Explainable AI</a></div>
+      <div class="pub-title">Ovarian Cancer Detection Using MobileNetV2 with GA-Optimized KNN and Explainable AI</div>
       <span class="badge gold">T&amp;F BOOK</span>
     </div>
     <div class="pub-meta">IDAA 2025 &middot; Taylor &amp; Francis Book Chapter</div>
     <div class="pub-authors">M. M. Rassel, B. Sutrudhar, L. Somoddar, M. S. Kabir, A. D. Sarker, S. M. Rohan</div>
-    <div class="pub-actions"><a class="pub-link" href="#" target="_blank" rel="noopener">&gt; PAPER_LINK</a></div>
+    <div class="pub-actions"><span class="pub-link muted">&gt; LINK_PENDING</span></div>
   </div>
 
   <div class="card">
@@ -1243,14 +1256,14 @@
     <div class="pub-title"><a href="https://journalrrsite.com/index.php/Myjrr/article/view/87" target="_blank" rel="noopener">Streamlining Dhaka's Daily Journey: The E-Ticketing Revolution</a></div>
     <span class="badge gold">JOURNAL</span>
   </div>
-  <div class="pub-meta">Journal / Conference Name &middot; Year</div>
+  <div class="pub-meta">Journal of Reproducible Research &middot; 2024</div>
   <div class="pub-authors">Md. Sayem Kabir, Saif Mostasir Rohan, MD. Mahadi Hasan Nayeem, Mahmud Al Alvi, Kazi Tanvir, Mohamed Kaisarul Haq, Farzana Nazera, Valliappan Raju</div>
   <div class="pub-actions"><a class="pub-link" href="https://journalrrsite.com/index.php/Myjrr/article/view/87" target="_blank" rel="noopener">&gt; PAPER_LINK</a></div>
 </div>
 
   <div class="cipher-footer">
     <span>// RESEARCH_NODE</span>
-    <span>14 PUBLICATIONS</span>
+    <span>15 PUBLICATIONS</span>
   </div>
 </section>
 
@@ -1458,6 +1471,17 @@
       <span class="contact-key">GOOGLE SCHOLAR</span>
       <a class="contact-btn" href="https://scholar.google.com/citations?user=mkikv5EAAAAJ&hl=en" target="_blank" rel="noopener noreferrer">&gt; VIEW_PUBLICATIONS</a>
     </div>
+    <div class="contact-row">
+  <span class="contact-key">CV</span>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <a class="contact-btn" href="assets/cv/Saif_Mostasir_Rohan_CV.pdf" target="_blank" rel="noopener noreferrer">
+      &gt; VIEW_CV
+    </a>
+    <a class="contact-btn" href="assets/cv/Saif_Mostasir_Rohan_CV.pdf" download>
+      &gt; DOWNLOAD
+    </a>
+  </div>
+</div>
     <div class="contact-row">
       <span class="contact-key">LOCATION</span>
       <span class="contact-val">Dhaka, Bangladesh</span>
